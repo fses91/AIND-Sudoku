@@ -26,10 +26,55 @@ def naked_twins(values):
         the values dictionary with the naked twins eliminated from peers.
     """
 
+    # Get boxes of length two
+    boxes_len_two = [k for k, v in values.items() if len(v) == 2]
+
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
+    for box in boxes_len_two:
+        for peer in peers[box]:
+            if len(values[peer]) == 2 and values[box] == values[peer]:
+                units = get_units_for_boxes(peer, box)
+                for unit in units:
+                    values = remove_tiwn_from_unit(values, unit, values[box])
+    return values
+
+def remove_tiwn_from_unit(values, unit, twin):
+    """Remove digits in twin from the given unit.
+    Args:
+        values(dict): a dictionary of the form {'box_name': '123456789', ...}
+        unit(list): a list of the form ['A1', 'A3', ...]
+        twin(str): a string which is a twin
+    
+    Returns:
+        the values dictionary which removed twins in the given unit.
+    """
+    for digit in twin:
+        for box in unit:
+            if values[box] != twin:
+                values = assign_value(values, box, values[box].replace(digit, ''))
+    return values
 
 
+def get_units_for_boxes(box1, box2):
+    """Get the units which contain both boxes
+    Args:
+        box1(str): first box
+        box2(str): second box
+    
+    Returns:
+        A list of units, where each unit contains each of the
+        given boxes.
+    """
+    units = []
+    for unit in unitlist:
+        if box1 in unit and box2 in unit:
+            units.append(unit)
+    return units
+
+
+def value_in_peers(values, value, box):
+    return [p for p in peers[box] if value[p] == value]
 
 
 rows = 'ABCDEFGHI'
@@ -40,27 +85,18 @@ def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [s + t for s in A for t in B]
 
-def append_diag_to_units(units):
-    """Appends the diagonal boxes to the units for a sudoku with diagonal constraints  
-    """
-    # Upper left corner to bottom right corner.
-    diag_1 = ['A1', 'B2', 'C3', 'D4', 'E5', 'F6', 'G7', 'H8', 'I9']
+# Upper left corner to bottom right corner.
+diag_1 = ['A1', 'B2', 'C3', 'D4', 'E5', 'F6', 'G7', 'H8', 'I9']
     # Bottom left corner to upper right corner.
-    diag_2 = ['A9', 'B8', 'C7', 'D6', 'E5', 'F4', 'G3', 'H2', 'I1']
-    for value in diag_1:
-        units[value].append(diag_1)
-    for value in diag_2:
-        units[value].append(diag_2)
-    return units
+diag_2 = ['A9', 'B8', 'C7', 'D6', 'E5', 'F4', 'G3', 'H2', 'I1']
 
 boxes = cross(rows, cols)
 
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', '456', '789')]
-unitlist = row_units + column_units + square_units
+unitlist = row_units + column_units + square_units + [diag_1] + [diag_2]
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
-units = append_diag_to_units(units)
 peers = dict((s, set(sum(units[s], [])) - set([s])) for s in boxes)
 
 
@@ -110,7 +146,7 @@ def eliminate(values):
     for box in solved_values:
         digit = values[box]
         for peer in peers[box]:
-            values[peer] = values[peer].replace(digit, '')
+            values = assign_value(values, peer, values[peer].replace(digit, ''))
     return values
 
 
@@ -141,7 +177,7 @@ def reduce_puzzle(values):
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
         values = eliminate(values)
         values = only_choice(values)
-        #values = naked_twins(values)
+        values = naked_twins(values)
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
         stalled = solved_values_before == solved_values_after
         if len([box for box in values.keys() if len(values[box]) == 0]):

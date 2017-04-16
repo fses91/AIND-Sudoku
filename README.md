@@ -3,11 +3,13 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: We reduce the search space, because we are removing values which we can't occur on a specific position,
+because they have to occur on another position.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: Diagonal sudokus have a smaller search space than non diagonal sudokus, because of the
+diagonal constraints.
 
 ### Install
 
