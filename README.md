@@ -3,13 +3,24 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: We reduce the search space, because we are removing values which we can't occur on a specific position,
-because they have to occur on another position.
+A: We reduce the search space, because we are removing values which can't occur on a specific position,
+because they have to occur on another position. 
+For example if we have a unit (row, column, diagonal, square) which contains two times a value of length two,
+we know that these are the only possible values for these two boxes, we don't now which value should go in which
+of the two boxes, but we know that none of these values can be placed in any other box in the same unit.
+We can generalize this solving strategy for n boxes of length n in the same unit, and so we are reducing the search space.
+So when we add this function to our reduce_puzzle() function, we don't need to try out so many values. It would also be possible
+to solve the sudoku without constraint propagation but we would have to generate all possibilities where the values can be, and
+then take the solution which is not violating our sodoku rules.
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
 A: Diagonal sudokus have a smaller search space than non diagonal sudokus, because of the
 diagonal constraints.
+For example we add the two diagonals (top left - bottom right, bottom left - top right), we have 
+less possibilities to place a value. Because the initial constraints where column, row and square if
+we now add the diagonal constraint we are now are not allowed to place values, where we were allowed 
+without the diagonal constraint.
 
 ### Install
 
